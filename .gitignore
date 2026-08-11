@@ -1,0 +1,9 @@
+node_modules/
+maintainer-gate-report.json
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
