@@ -77,7 +77,7 @@ This is an early open-source maintainer tool. The initial release focuses on Nod
 
 ## Author
 
-陈明净 (Tan Ming Jing)
+devtmj1123
 
 ## License
 
