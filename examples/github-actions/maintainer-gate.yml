@@ -1,0 +1,57 @@
+name: Maintainer Gate
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install target dependencies
+        run: npm ci
+
+      - name: Checkout Codex Maintainer Gate
+        uses: actions/checkout@v4
+        with:
+          repository: devtmj1123/codex-maintainer-gate
+          path: .codex-maintainer-gate
+
+      - name: Run evidence-first gate
+        shell: bash
+        run: |
+          if [[ -n "${GITHUB_BASE_REF}" ]]; then
+            git fetch origin "${GITHUB_BASE_REF}" --depth=1 || true
+            node .codex-maintainer-gate/scripts/preflight.mjs \
+              --repo "$GITHUB_WORKSPACE" \
+              --base "origin/${GITHUB_BASE_REF}" \
+              --output maintainer-gate-report.json
+          else
+            node .codex-maintainer-gate/scripts/preflight.mjs \
+              --repo "$GITHUB_WORKSPACE" \
+              --output maintainer-gate-report.json
+          fi
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maintainer-gate-report
+          path: maintainer-gate-report.json
+          if-no-files-found: warn
