@@ -1,0 +1,26 @@
+{
+  "name": "codex-maintainer-gate",
+  "version": "0.1.0",
+  "description": "Evidence-first fail-closed maintainer gate and Codex Skill for open-source repositories",
+  "type": "module",
+  "license": "MIT",
+  "author": "陈明净 (Tan Ming Jing)",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test",
+    "lint": "node --check scripts/preflight.mjs && node --check scripts/validate-skill.mjs && node --check test/preflight.test.mjs",
+    "build": "node scripts/validate-skill.mjs",
+    "validate:skill": "node scripts/validate-skill.mjs",
+    "gate": "node scripts/preflight.mjs --repo . --output maintainer-gate-report.json"
+  },
+  "keywords": [
+    "codex",
+    "open-source",
+    "maintainer",
+    "release-gate",
+    "security",
+    "ci"
+  ]
+}
