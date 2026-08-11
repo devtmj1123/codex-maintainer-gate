@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Maintainer Gate"
+  short_description: "Fail-closed OSS review and release evidence"
+  default_prompt: "Use $codex-maintainer-gate to review this repository change and produce an evidence-bound release decision."
