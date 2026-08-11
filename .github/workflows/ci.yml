@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Syntax checks
+        run: npm run lint
+
+      - name: Validate Codex Skill
+        run: npm run validate:skill
+
+      - name: Run maintainer gate
+        shell: bash
+        run: |
+          if [[ -n "${GITHUB_BASE_REF}" ]]; then
+            git fetch origin "${GITHUB_BASE_REF}" --depth=1 || true
+            node scripts/preflight.mjs --repo . --base "origin/${GITHUB_BASE_REF}" --output maintainer-gate-report.json
+          else
+            node scripts/preflight.mjs --repo . --output maintainer-gate-report.json
+          fi
+
+      - name: Upload gate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maintainer-gate-report
+          path: maintainer-gate-report.json
+          if-no-files-found: warn
